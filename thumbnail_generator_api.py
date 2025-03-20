@@ -152,12 +152,14 @@ def generate_thumbnail():
         "message": "Échec de la génération de la miniature"
     }), 500
 
-@app.route('/thumbnails/<filename>', methods=['GET'])
+@app.route('/thumbnails/<filename>', methods=['GET','POST'])
 def get_thumbnail(filename):
     """Endpoint pour récupérer une miniature générée"""
     if os.path.exists(filename):
         return send_file(filename)
     return jsonify({"error": "Fichier non trouvé"}), 404
 
+import os
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    port = int(os.environ.get("PORT", 10000))  # Récupérer le port défini par Render
+    app.run(host='0.0.0.0', port=port, debug=True)
