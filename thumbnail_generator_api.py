@@ -155,3 +155,42 @@ if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))  # 10000 par défaut si PORT n'est pas défini
     app.run(host="0.0.0.0", port=port)
 
+
+def generate_image_with_runway(title, stats=None):
+    """Génère une image avec Runway ML"""
+    try:
+        print("🔍 Début de la génération avec le titre :", title)
+        
+        headers = {
+            "Authorization": f"Bearer {RUNWAY_API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        data = {
+            "prompt": f"Create a YouTube thumbnail with the title '{title}'",
+            "model": "stable-diffusion-xl-1024-v1-0",
+            "params": {
+                "width": 1280,
+                "height": 720,
+                "num_outputs": 1
+            }
+        }
+
+        print("📤 Envoi de la requête à Runway ML...")
+        response = requests.post(RUNWAY_API_URL, headers=headers, json=data)
+
+        print("📥 Réponse reçue :", response.status_code, response.text)
+
+        if response.status_code != 200:
+            return None
+
+        result = response.json()
+        if "output" in result and "images" in result["output"]:
+            return result["output"]["images"][0]
+        else:
+            print("🚨 Réponse inattendue de Runway ML :", result)
+            return None
+
+    except Exception as e:
+        print(f"❌ Erreur lors de la génération : {e}")
+        return None
